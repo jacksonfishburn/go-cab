@@ -5,9 +5,11 @@ import (
 )
 
 func Routes(mux *http.ServeMux) {
-	mux.HandleFunc("/ping", Ping)
-	mux.HandleFunc("/add", Add)
-	mux.HandleFunc("/grab", Grab)
-	mux.HandleFunc("/del", Del)
-	mux.HandleFunc("/peek", Peek)
+	api := newAPI()
+
+	mux.HandleFunc("/ping", api.Ping)
+	mux.HandleFunc("/add", api.Add)
+	mux.HandleFunc("/grab", api.Grab)
+	mux.HandleFunc("/del", api.Del)
+	mux.HandleFunc("/peek", api.Peek)
 }
