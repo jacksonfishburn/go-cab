@@ -2,47 +2,56 @@ package api
 
 import (
 	"net/http"
-	"github.com/jacksonfishburn/go-cab/internal/files"
+
+	"github.com/jacksonfishburn/go-cab/internal/file"
 )
 
-type API struct {
-	manager files.Manager 
+type Handler struct {
+	Service file.Service
 }
 
-func newAPI() API {
-	return API{manager: files.Manager{}}
-}
-
-func (api API) Ping(w http.ResponseWriter, r *http.Request) {
-	if api.manager.Ping() {
+func (h Handler) Ping(w http.ResponseWriter, r *http.Request) {
+	if h.Service.Ping() {
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
-func (api API) Add(w http.ResponseWriter, r *http.Request) {
-	response := api.manager.Add()
+func (h Handler) Add(w http.ResponseWriter, r *http.Request) {
+	err := h.Service.Add()
+
+	if err != nil {
+		
+	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(response))
 }
 
-func (api API) Grab(w http.ResponseWriter, r *http.Request) {
-	response := api.manager.Grab()
+func (h Handler) Grab(w http.ResponseWriter, r *http.Request) {
+	err := h.Service.Grab()
+
+	if err != nil {
+		
+	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(response))
 }
 
-func (api API) Del(w http.ResponseWriter, r *http.Request) {
-	response := api.manager.Del()
+func (h Handler) Del(w http.ResponseWriter, r *http.Request) {
+	err := h.Service.Del()
+
+	if err != nil {
+		
+	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(response))
 }
 
-func (api API) Peek(w http.ResponseWriter, r *http.Request) {
-	response := api.manager.Peek()
+func (h Handler) Peek(w http.ResponseWriter, r *http.Request) {
+	err := h.Service.Peek()
+
+	if err != nil {
+		
+	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(response))
 }

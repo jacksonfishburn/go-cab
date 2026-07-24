@@ -4,12 +4,10 @@ import (
 	"net/http"
 )
 
-func Routes(mux *http.ServeMux) {
-	api := newAPI()
-
-	mux.HandleFunc("/ping", api.Ping)
-	mux.HandleFunc("/add", api.Add)
-	mux.HandleFunc("/grab", api.Grab)
-	mux.HandleFunc("/del", api.Del)
-	mux.HandleFunc("/peek", api.Peek)
+func (h Handler) Routes(mux *http.ServeMux) {
+	mux.HandleFunc("/ping", h.Ping)
+	mux.HandleFunc("/add", h.Add)
+	mux.HandleFunc("/grab", h.Grab)
+	mux.HandleFunc("/del", h.Del)
+	mux.HandleFunc("/peek", h.Peek)
 }
