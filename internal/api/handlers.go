@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/jacksonfishburn/go-cab/internal/file"
@@ -17,30 +19,48 @@ func (h Handler) Ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) Add(w http.ResponseWriter, r *http.Request) {
-	record, err := h.Service.Add()
+	defer r.Body.Close()
+	name := r.PathValue("name")
+    data, err := io.ReadAll(r.Body)
+
+    if err != nil {
+        http.Error(w, "failed to read body", http.StatusBadRequest)
+        return
+    }
+
+	record, err := h.Service.Add(name, data)
 
 	if err != nil {
-		
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+    if err := json.NewEncoder(w).Encode(record); err != nil {
+        http.Error(w, "failed to encode response", http.StatusInternalServerError)
+        return
+    }
 }
 
 func (h Handler) Grab(w http.ResponseWriter, r *http.Request) {
-	data, err := h.Service.Grab()
+	name := r.PathValue("name")
+	data, err := h.Service.Grab(name)
 
 	if err != nil {
-		
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
+	w.Write(data)
 }
 
 func (h Handler) Del(w http.ResponseWriter, r *http.Request) {
-	err := h.Service.Del()
+	name := r.PathValue("name")
+	err := h.Service.Del(name)
 
 	if err != nil {
-		
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -50,8 +70,13 @@ func (h Handler) Peek(w http.ResponseWriter, r *http.Request) {
 	list, err := h.Service.Peek()
 
 	if err != nil {
-		
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(list); err != nil {
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
