@@ -30,11 +30,11 @@ func (s *Service) Ping() bool {
 
 func (s *Service) Add(name string, data []byte) (Record, error) {
 	record := Record{
-		name:      name,
-		size:      len(data),
-		md5:       computeMd5(data),
-		createdAt: time.Now().String(),
-		updatedAt: time.Now().String(),
+		Name:      name,
+		Size:      len(data),
+		MD5:       computeMd5(data),
+		CreatedAt: time.Now().String(),
+		UpdatedAt: time.Now().String(),
 	}
 	err := s.MetadataStore.Put(name, record)
 

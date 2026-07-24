@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"maps"
 
 	"github.com/jacksonfishburn/go-cab/internal/file"
 )
@@ -27,7 +28,7 @@ func (m MemStore) Get(name string) (file.Record, error) {
 }
 
 func (m MemStore) List() (map[string]file.Record, error) {
-	return m.Records, nil
+	return maps.Clone(m.Records), nil
 }
 
 func (m MemStore) Delete(name string) error {
