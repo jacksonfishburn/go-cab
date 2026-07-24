@@ -1,6 +1,6 @@
 package file
 
-type FileRecord struct {
+type Record struct {
 	name string
 	size float32
 	md5 string

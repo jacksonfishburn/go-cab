@@ -5,9 +5,9 @@ import (
 )
 
 func (h Handler) Routes(mux *http.ServeMux) {
-	mux.HandleFunc("/ping", h.Ping)
-	mux.HandleFunc("/add", h.Add)
-	mux.HandleFunc("/grab", h.Grab)
-	mux.HandleFunc("/del", h.Del)
-	mux.HandleFunc("/peek", h.Peek)
+	mux.HandleFunc("GET /ping", h.Ping)
+	mux.HandleFunc("POST /add", h.Add)
+	mux.HandleFunc("GET /grab", h.Grab)
+	mux.HandleFunc("DELETE /del", h.Del)
+	mux.HandleFunc("GET /peek", h.Peek)
 }

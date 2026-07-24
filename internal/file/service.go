@@ -1,9 +1,9 @@
 package file
 
 type MetadataStore interface {
-    Put(name string, record FileRecord) error
-    Get(name string) (FileRecord, error)
-    List() (map[string]FileRecord, error)
+    Put(name string, record Record) error
+    Get(name string) (Record, error)
+    List() (map[string]Record, error)
     Delete(name string) error
 }
 
