@@ -2,7 +2,7 @@ package file
 
 type Record struct {
 	name string
-	size float32
+	size int
 	md5 string
 	createdAt string
 	updatedAt string

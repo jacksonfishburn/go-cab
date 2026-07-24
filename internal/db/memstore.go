@@ -7,19 +7,19 @@ import (
 )
 
 type MemStore struct {
-	records map[string]file.Record
+	Records map[string]file.Record
 }
 
 func (m MemStore) Put(name string, record file.Record) error {
-	if _, taken := m.records[name]; taken {
+	if _, taken := m.Records[name]; taken {
 		return errors.New("Name Already Taken")
 	}
-	m.records[name] = record
+	m.Records[name] = record
 	return nil
 }
 
 func (m MemStore) Get(name string) (file.Record, error) {
-	v, ok := m.records[name]
+	v, ok := m.Records[name]
 	if !ok {
 		return file.Record{}, errors.New("No such Record")
 	}
@@ -27,14 +27,14 @@ func (m MemStore) Get(name string) (file.Record, error) {
 }
 
 func (m MemStore) List() (map[string]file.Record, error) {
-	return m.records, nil
+	return m.Records, nil
 }
 
 func (m MemStore) Delete(name string) error {
-	_, ok := m.records[name]
+	_, ok := m.Records[name]
 	if !ok {
 		return errors.New("No such Record")
 	}
-	delete(m.records, name)
+	delete(m.Records, name)
 	return nil
 }

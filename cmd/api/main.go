@@ -10,8 +10,8 @@ import (
 func main() {
 	mux := http.NewServeMux()
 
-	var blobstore file.Store
-	var mdStore db.MemStore
+	blobstore := file.Store{Data: make(map[string][]byte)}
+	mdStore := db.MemStore{Records: make(map[string]file.Record)}
 
 	service := file.Service{BlobStore: blobstore, MetadataStore: mdStore}
 	handler := api.Handler{Service: service}

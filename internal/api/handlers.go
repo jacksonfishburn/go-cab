@@ -17,7 +17,7 @@ func (h Handler) Ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) Add(w http.ResponseWriter, r *http.Request) {
-	err := h.Service.Add()
+	record, err := h.Service.Add()
 
 	if err != nil {
 		
@@ -27,7 +27,7 @@ func (h Handler) Add(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) Grab(w http.ResponseWriter, r *http.Request) {
-	err := h.Service.Grab()
+	data, err := h.Service.Grab()
 
 	if err != nil {
 		
@@ -47,7 +47,7 @@ func (h Handler) Del(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) Peek(w http.ResponseWriter, r *http.Request) {
-	err := h.Service.Peek()
+	list, err := h.Service.Peek()
 
 	if err != nil {
 		
