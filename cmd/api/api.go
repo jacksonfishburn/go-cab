@@ -18,12 +18,13 @@ type application struct {
 
 type config struct {
 	addr string
+	token string
 	blobstore file.BlobStore
 	mdStore file.MetadataStore
 }
 
 func (app *application) run() error {
-	cfg := app.config
+	cfg := &app.config
 
 	app.service = file.Service{
 		BlobStore: cfg.blobstore,
@@ -31,14 +32,17 @@ func (app *application) run() error {
 	}
 	app.handler = api.Handler{
 		Service: app.service,
+		Token: cfg.token,
 	}
 
 	mux := http.NewServeMux()
 	app.handler.Routes(mux)
 
+	handler := app.handler.Authorize(mux)
+
 	srv := &http.Server{
 		Addr: cfg.addr,
-		Handler: mux,
+		Handler: handler,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,

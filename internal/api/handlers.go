@@ -10,6 +10,7 @@ import (
 
 type Handler struct {
 	Service file.Service
+	Token string
 }
 
 func (h Handler) Ping(w http.ResponseWriter, r *http.Request) {
@@ -32,6 +33,7 @@ func (h Handler) Add(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

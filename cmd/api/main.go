@@ -13,6 +13,7 @@ func main() {
 
 	cfg := config{
 		addr: env.GetString("ADDR", ":8080"),
+		token: env.GetString("AUTH_TOKEN", ""),
 		blobstore: &file.Store{Data: make(map[string][]byte)},
 		mdStore: &db.MemStore{Records: make(map[string]file.Record)},
 	}
