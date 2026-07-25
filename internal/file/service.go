@@ -33,8 +33,8 @@ func (s *Service) Add(name string, data []byte) (Record, error) {
 		Name:      name,
 		Size:      len(data),
 		MD5:       computeMd5(data),
-		CreatedAt: time.Now().String(),
-		UpdatedAt: time.Now().String(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	err := s.MetadataStore.Put(name, record)
 
