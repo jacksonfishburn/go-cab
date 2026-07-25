@@ -5,12 +5,14 @@ import (
 
 	"github.com/jacksonfishburn/go-cab/internal/file"
 	"github.com/jacksonfishburn/go-cab/internal/db"
+	"github.com/jacksonfishburn/go-cab/internal/env"
 )
 
 func main() {
+	env.Init()
 
 	cfg := config{
-		addr: ":8080",
+		addr: env.GetString("ADDR", ":8080"),
 		blobstore: &file.Store{Data: make(map[string][]byte)},
 		mdStore: &db.MemStore{Records: make(map[string]file.Record)},
 	}
