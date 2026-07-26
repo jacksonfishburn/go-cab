@@ -1,9 +1,9 @@
 package env
 
 import (
+	"log"
 	"os"
 	"strconv"
-	"log"
 
 	"github.com/joho/godotenv"
 )
@@ -27,7 +27,7 @@ func GetInt(key string, fallback int) int {
 	if !ok {
 		return fallback
 	}
-	
+
 	valAsInt, err := strconv.Atoi(val)
 
 	if err != nil {

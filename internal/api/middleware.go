@@ -28,7 +28,7 @@ func (h Handler) Authorize(next http.Handler) http.HandlerFunc {
 			http.Error(w, "invalid token", http.StatusUnauthorized)
 			return
 		}
-		
+
 		next.ServeHTTP(w, r)
 	}
 }

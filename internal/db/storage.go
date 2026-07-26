@@ -20,17 +20,17 @@ func NewStore(db *sql.DB) SQLiteStore {
 }
 
 func Open(path string) (*SQLiteStore, error) {
-    sqlDB, err := sql.Open("sqlite", path)
-    if err != nil {
-        return nil, err
-    }
-    if err := sqlDB.Ping(); err != nil {
-        return nil, err
-    }
-    if err := createTables(sqlDB); err != nil {
-        return nil, err
-    }
-    return &SQLiteStore{db: sqlDB}, nil
+	sqlDB, err := sql.Open("sqlite", path)
+	if err != nil {
+		return nil, err
+	}
+	if err := sqlDB.Ping(); err != nil {
+		return nil, err
+	}
+	if err := createTables(sqlDB); err != nil {
+		return nil, err
+	}
+	return &SQLiteStore{db: sqlDB}, nil
 }
 
 func createTables(db *sql.DB) error {
@@ -47,7 +47,7 @@ func createTables(db *sql.DB) error {
 }
 
 func (s *SQLiteStore) Close() error {
-    return s.db.Close()
+	return s.db.Close()
 }
 
 func (s SQLiteStore) Put(name string, record file.Record) error {

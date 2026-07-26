@@ -1,38 +1,38 @@
 package main
 
 import (
+	"errors"
+	"log"
 	"net/http"
 	"time"
-	"log"
-	"errors"
 
-	"github.com/jacksonfishburn/go-cab/internal/file"
 	"github.com/jacksonfishburn/go-cab/internal/api"
+	"github.com/jacksonfishburn/go-cab/internal/file"
 )
 
 type application struct {
-	config config
+	config  config
 	service file.Service
 	handler api.Handler
 }
 
 type config struct {
-	addr string
-	token string
+	addr      string
+	token     string
 	blobstore file.BlobStore
-	mdStore file.MetadataStore
+	mdStore   file.MetadataStore
 }
 
 func (app *application) run() error {
 	cfg := &app.config
 
 	app.service = file.Service{
-		BlobStore: cfg.blobstore,
+		BlobStore:     cfg.blobstore,
 		MetadataStore: cfg.mdStore,
 	}
 	app.handler = api.Handler{
 		Service: app.service,
-		Token: cfg.token,
+		Token:   cfg.token,
 	}
 
 	mux := http.NewServeMux()
@@ -41,8 +41,8 @@ func (app *application) run() error {
 	handler := app.handler.Authorize(mux)
 
 	srv := &http.Server{
-		Addr: cfg.addr,
-		Handler: handler,
+		Addr:         cfg.addr,
+		Handler:      handler,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,

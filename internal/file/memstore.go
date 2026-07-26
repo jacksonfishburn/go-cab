@@ -2,11 +2,11 @@ package file
 
 import "errors"
 
-type Store struct {
+type MemStore struct {
 	Data map[string][]byte
 }
 
-func (s *Store) Save(name string, data []byte) error {
+func (s *MemStore) Save(name string, data []byte) error {
 	if _, exists := s.Data[name]; exists {
 		return errors.New("Name Already Taken")
 	}
@@ -14,7 +14,7 @@ func (s *Store) Save(name string, data []byte) error {
 	return nil
 }
 
-func (s *Store) Get(name string) ([]byte, error) {
+func (s *MemStore) Get(name string) ([]byte, error) {
 	val, ok := s.Data[name]
 	if !ok {
 		return nil, errors.New("No such bytes")
@@ -22,7 +22,7 @@ func (s *Store) Get(name string) ([]byte, error) {
 	return val, nil
 }
 
-func (s *Store) Delete(name string) error {
+func (s *MemStore) Delete(name string) error {
 	_, ok := s.Data[name]
 	if !ok {
 		return errors.New("No such bytes")

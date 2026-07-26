@@ -17,12 +17,11 @@ func main() {
 	}
 	defer mdStore.Close()
 
-
 	cfg := config{
-		addr: env.GetString("ADDR", ":8080"),
-		token: env.GetString("AUTH_TOKEN", ""),
-		blobstore: &file.Store{Data: make(map[string][]byte)},
-		mdStore: mdStore,
+		addr:      env.GetString("ADDR", ":8080"),
+		token:     env.GetString("AUTH_TOKEN", ""),
+		blobstore: &file.MemStore{Data: make(map[string][]byte)},
+		mdStore:   mdStore,
 	}
 	app := &application{
 		config: cfg,

@@ -10,7 +10,7 @@ import (
 
 type Handler struct {
 	Service file.Service
-	Token string
+	Token   string
 }
 
 func (h Handler) Ping(w http.ResponseWriter, r *http.Request) {
@@ -22,12 +22,12 @@ func (h Handler) Ping(w http.ResponseWriter, r *http.Request) {
 func (h Handler) Add(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	name := r.PathValue("name")
-    data, err := io.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 
-    if err != nil {
-        http.Error(w, "failed to read body", http.StatusBadRequest)
-        return
-    }
+	if err != nil {
+		http.Error(w, "failed to read body", http.StatusBadRequest)
+		return
+	}
 
 	record, err := h.Service.Add(name, data)
 
@@ -37,10 +37,10 @@ func (h Handler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-    if err := json.NewEncoder(w).Encode(record); err != nil {
-        http.Error(w, "failed to encode response", http.StatusInternalServerError)
-        return
-    }
+	if err := json.NewEncoder(w).Encode(record); err != nil {
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h Handler) Grab(w http.ResponseWriter, r *http.Request) {
