@@ -17,10 +17,15 @@ func main() {
 	}
 	defer mdStore.Close()
 
+	fileStore, err := file.Open(env.GetString("FILE_STORE_DIR,", ""))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	cfg := config{
 		addr:      env.GetString("ADDR", ":8080"),
 		token:     env.GetString("AUTH_TOKEN", ""),
-		blobstore: &file.MemStore{Data: make(map[string][]byte)},
+		blobstore: fileStore,
 		mdStore:   mdStore,
 	}
 	app := &application{

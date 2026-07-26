@@ -14,7 +14,6 @@ func WriteError(w http.ResponseWriter, r *http.Request, err error) {
 	msg := "internal server error"
 
 	switch {
-
 	case errors.Is(err, caberr.ErrNotFound):
 		status = http.StatusNotFound
 
