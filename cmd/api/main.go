@@ -17,7 +17,7 @@ func main() {
 	}
 	defer mdStore.Close()
 
-	fileStore, err := file.Open(env.GetString("FILE_STORE_DIR,", ""))
+	fileStore, err := file.Open(env.GetString("FILE_STORE_DIR", "data"))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -29,6 +29,12 @@ func (s *Service) Ping() bool {
 }
 
 func (s *Service) Add(name string, data []byte) (Record, error) {
+	err := s.BlobStore.Save(name, data)
+
+	if err != nil {
+		return Record{}, err
+	}
+
 	record := Record{
 		Name:      name,
 		Size:      len(data),
@@ -36,15 +42,10 @@ func (s *Service) Add(name string, data []byte) (Record, error) {
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-	err := s.MetadataStore.Put(name, record)
+	err = s.MetadataStore.Put(name, record)
 
 	if err != nil {
-		return Record{}, err
-	}
-
-	err = s.BlobStore.Save(name, data)
-
-	if err != nil {
+		_ = s.BlobStore.Delete(name)
 		return Record{}, err
 	}
 
