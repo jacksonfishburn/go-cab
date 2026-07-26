@@ -39,3 +39,17 @@ func Internal(message string, err error) error {
 		Err:     err,
 	}
 }
+
+func NotFound(message string) error {
+	return &CabErr{
+		Code: ErrNotFound,
+		Message: message,
+	}
+}
+
+func AlreadyExists(message string) error {
+	return &CabErr{
+		Code: ErrAlreadyExists,
+		Message: message,
+	}
+}

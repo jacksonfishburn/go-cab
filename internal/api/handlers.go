@@ -25,20 +25,20 @@ func (h Handler) Add(w http.ResponseWriter, r *http.Request) {
 	data, err := io.ReadAll(r.Body)
 
 	if err != nil {
-		http.Error(w, "failed to read body", http.StatusBadRequest)
+		WriteError(w, r, err)	
 		return
 	}
 
 	record, err := h.Service.Add(name, data)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		WriteError(w, r, err)	
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(record); err != nil {
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		WriteError(w, r, err)
 		return
 	}
 }
@@ -48,7 +48,7 @@ func (h Handler) Grab(w http.ResponseWriter, r *http.Request) {
 	data, err := h.Service.Grab(name)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		WriteError(w, r, err)
 		return
 	}
 
@@ -61,7 +61,7 @@ func (h Handler) Del(w http.ResponseWriter, r *http.Request) {
 	err := h.Service.Del(name)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		WriteError(w, r, err)
 		return
 	}
 
@@ -72,13 +72,13 @@ func (h Handler) Peek(w http.ResponseWriter, r *http.Request) {
 	list, err := h.Service.Peek()
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		WriteError(w, r, err)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(list); err != nil {
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		WriteError(w, r, err)
 		return
 	}
 }

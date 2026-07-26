@@ -23,7 +23,7 @@ func WriteError(w http.ResponseWriter, r *http.Request, err error) {
 	}
 
 	var ce *caberr.CabErr
-	if errors.As(err, &ce) {
+	if errors.As(err, &ce) && status < 500 && ce.Message != "" {
 		msg = ce.Message
 	}
 
