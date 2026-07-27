@@ -11,7 +11,7 @@ import (
 func main() {
 	env.Init()
 
-	mdStore, err := db.Open(env.GetString("DB_PATH", "go-cab.db"))
+	mdStore, err := db.Open(env.GetString("METADATA_DIR", "go-cab.db"))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -43,8 +43,8 @@ func (app *application) run() error {
 	srv := &http.Server{
 		Addr:         cfg.addr,
 		Handler:      handler,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
 

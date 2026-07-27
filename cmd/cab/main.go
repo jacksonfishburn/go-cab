@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jacksonfishburn/go-cab/internal/env"
 	"github.com/spf13/cobra"
 )
 
@@ -27,10 +26,8 @@ func execute() {
 }
 
 func main() {
-	env.Init()
-
-	apiURL = env.GetString("API_URL", "http://localhost:8080")
-	token = env.GetString("AUTH_TOKEN", "")
+	rootCmd.PersistentFlags().StringVar(&apiURL, "url", "http://localhost:8080", "API base URL")
+	rootCmd.PersistentFlags().StringVar(&token, "token", "asdf123", "Auth Token")
 
 	addCommands()
 	execute()
