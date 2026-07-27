@@ -17,7 +17,10 @@ var addCmd = &cobra.Command{
 }
 
 var grabCmd = &cobra.Command{
-	Use: "grab <name> [dir]",
+	Use:   "grab <name> [dir]",
+	Short: "Download a Directory from storage",
+	Args:  cobra.RangeArgs(1, 2),
+	RunE:  grab,
 }
 
 func addCommands() {
@@ -47,6 +50,21 @@ func add(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func grab(cmd *cobra.Command, args []string) error {
+	name := args[0]
+	dir := "."
+	if len(args) > 1 {
+		dir = args[1]
+	}
+
+	c := newClient(apiURL, token)
+	blob, err := c.Grab(name)
+	if err != nil {
+		return err
+	}
+
+	return putBlob(dir, blob)
+}
 
 func printRecords(records ...file.Record) {
 	if len(records) == 0 {

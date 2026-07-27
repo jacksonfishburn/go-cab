@@ -78,6 +78,19 @@ func (c *client) Add(name string, blob []byte) (file.Record, error) {
 	return record, nil
 }
 
+func (c *client) Grab(name string) ([]byte, error) {
+	path := "grab/" + url.PathEscape(name)
+
+	respBody, status, err := c.request(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	if err := checkStatus(status, respBody); err != nil {
+		return nil, err
+	}
+	return respBody, nil
+}
+
 func joinURL(base, path string) string {
 	return strings.TrimRight(base, "/") + "/" + strings.TrimLeft(path, "/")
 }
