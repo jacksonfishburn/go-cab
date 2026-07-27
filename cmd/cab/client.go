@@ -2,39 +2,49 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
+
+	"github.com/jacksonfishburn/go-cab/internal/file"
 )
 
-type Client struct {
+type client struct {
 	URL    string
 	Token  string
 	client *http.Client
 }
 
-func NewClient(URL, token string) *Client {
-	return &Client{
-		URL:   URL,
+func newClient(apiURL, token string) *client {
+	return &client{
+		URL:   apiURL,
 		Token: token,
 		client: &http.Client{
-			Timeout: 10 * time.Second,
+			Timeout: 5 * time.Minute,
 		},
 	}
 }
 
-func (c *Client) Request(method, path string, body []byte) ([]byte, int, error) {
+func (c *client) request(method, path string, body []byte) ([]byte, int, error) {
 	var reqBody io.Reader
 	if body != nil {
-		reqBody = bytes.NewBuffer(body)
+		reqBody = bytes.NewReader(body)
 	}
 
-	req, err := http.NewRequest(method, c.URL+path, reqBody)
+	endpoint := joinURL(c.URL, path)
+	req, err := http.NewRequest(method, endpoint, reqBody)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	req.Header.Set("Authorization", "Bearer "+c.Token)
+	if body != nil {
+		req.Header.Set("Content-Type", "application/octet-stream")
+	}
 
 	resp, err := c.client.Do(req)
 	if err != nil {
@@ -48,18 +58,40 @@ func (c *Client) Request(method, path string, body []byte) ([]byte, int, error) 
 	}
 
 	return respBody, resp.StatusCode, nil
-
 }
 
-type Record struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Size      int       `json:"size"`
-	MD5       string    `json:"md5"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+func (c *client) Add(name string, blob []byte) (file.Record, error) {
+	path := "add/" + url.PathEscape(name)
+
+	respBody, status, err := c.request(http.MethodPost, path, blob)
+	if err != nil {
+		return file.Record{}, err
+	}
+	if err := checkStatus(status, respBody); err != nil {
+		return file.Record{}, err
+	}
+
+	var record file.Record
+	if err := json.Unmarshal(respBody, &record); err != nil {
+		return file.Record{}, fmt.Errorf("decode response: %w", err)
+	}
+	return record, nil
 }
 
-func (c *Client) Add(name string, blob []byte) (Record, error) {
-	return Record{}, nil
+func joinURL(base, path string) string {
+	return strings.TrimRight(base, "/") + "/" + strings.TrimLeft(path, "/")
+}
+
+func checkStatus(status int, body []byte) error {
+	if status >= 200 && status < 300 {
+		return nil
+	}
+
+	var apiErr struct {
+		Error string `json:"error"`
+	}
+	if err := json.Unmarshal(body, &apiErr); err == nil && apiErr.Error != "" {
+		return fmt.Errorf("api error (%d): %s", status, apiErr.Error)
+	}
+	return fmt.Errorf("api error (%d): %s", status, bytes.TrimSpace(body))
 }

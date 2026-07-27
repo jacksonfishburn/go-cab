@@ -1,44 +1,72 @@
 package main
 
 import (
+	"time"
+	"fmt"
+
 	"github.com/spf13/cobra"
+
+	"github.com/jacksonfishburn/go-cab/internal/file"
 )
 
-var AddCmd = &cobra.Command{
-	Use:   "add [name] [dir]",
+var addCmd = &cobra.Command{
+	Use:   "add <name> [dir]",
 	Short: "Upload a Directory to storage",
-	Args:  cobra.ExactArgs(2),
-	RunE:  Add,
+	Args:  cobra.RangeArgs(1, 2),
+	RunE:  add,
+}
+
+var grabCmd = &cobra.Command{
+	Use: "grab <name> [dir]",
 }
 
 func addCommands() {
-	rootCmd.AddCommand(AddCmd)
+	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(grabCmd)
 }
 
-func Add(cmd *cobra.Command, args []string) error {
+func add(cmd *cobra.Command, args []string) error {
 	name := args[0]
-	dir := args[1]
+	dir := "."
+	if len(args) > 1 {
+		dir = args[1]
+	}
 
 	blob, err := getBlob(dir)
 	if err != nil {
 		return err
 	}
 
-	client := NewClient(URL, Token)
-	record, err := client.Add(name, blob)
+	c := newClient(apiURL, token)
+	record, err := c.Add(name, blob)
 	if err != nil {
 		return err
 	}
 
-	printRecord(record)
+	printRecords(record)
 	return nil
 }
 
-func printRecord(r Record) {
 
+func printRecords(records ...file.Record) {
+	if len(records) == 0 {
+		fmt.Println("no records")
+		return
+	}
+
+	fmt.Printf("%-24s %10s %-32s %-25s %-25s\n", "NAME", "SIZE", "MD5", "CREATED", "UPDATED")
+	for _, r := range records {
+		printRecord(r)
+	}
 }
 
-func getBlob(dir string) ([]byte, error) {
-	var blob []byte
-	return blob, nil
+func printRecord(r file.Record) {
+	fmt.Printf("%-24s %10d %-32s %-25s %-25s\n",
+		r.Name,
+		r.Size,
+		r.MD5,
+		r.CreatedAt.Format(time.RFC3339),
+		r.UpdatedAt.Format(time.RFC3339),
+	)
 }
+

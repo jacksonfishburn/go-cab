@@ -9,13 +9,14 @@ import (
 )
 
 var (
-	URL   string
-	Token string
+	apiURL string
+	token  string
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "cab",
-	Short: "File Uploader",
+	Use:          "cab",
+	Short:        "File Uploader",
+	SilenceUsage: true,
 }
 
 func execute() {
@@ -28,8 +29,8 @@ func execute() {
 func main() {
 	env.Init()
 
-	URL = env.GetString("API_URL", "http://localhost:8080")
-	Token = env.GetString("AUTH_TOKEN", "")
+	apiURL = env.GetString("API_URL", "http://localhost:8080")
+	token = env.GetString("AUTH_TOKEN", "")
 
 	addCommands()
 	execute()
