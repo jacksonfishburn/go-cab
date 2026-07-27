@@ -8,13 +8,12 @@ var AddCmd = &cobra.Command{
 	Use:   "add [name] [dir]",
 	Short: "Upload a Directory to storage",
 	Args:  cobra.ExactArgs(2),
-	RunE: Add,
+	RunE:  Add,
 }
 
 func addCommands() {
 	rootCmd.AddCommand(AddCmd)
 }
-
 
 func Add(cmd *cobra.Command, args []string) error {
 	name := args[0]
@@ -36,7 +35,7 @@ func Add(cmd *cobra.Command, args []string) error {
 }
 
 func printRecord(r Record) {
-	
+
 }
 
 func getBlob(dir string) ([]byte, error) {
