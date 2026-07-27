@@ -4,12 +4,15 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	_ "modernc.org/sqlite"
 
 	"github.com/jacksonfishburn/go-cab/internal/caberr"
 	"github.com/jacksonfishburn/go-cab/internal/file"
 )
+
+const timeLayout = time.RFC3339Nano
 
 type SQLiteStore struct {
 	db *sql.DB
@@ -65,7 +68,9 @@ func (s SQLiteStore) Put(name string, record file.Record) error {
 
 	_, err = s.db.Exec(
 		`INSERT INTO records (name, size, md5, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
-		name, record.Size, record.MD5, record.CreatedAt, record.UpdatedAt,
+		name, record.Size, record.MD5,
+		record.CreatedAt.Format(timeLayout),
+		record.UpdatedAt.Format(timeLayout),
 	)
 	if err != nil {
 		return caberr.Internal("sqlite put: insert", err)
@@ -76,16 +81,20 @@ func (s SQLiteStore) Put(name string, record file.Record) error {
 
 func (s SQLiteStore) Get(name string) (file.Record, error) {
 	var r file.Record
+	var createdAt, updatedAt string
 
 	err := s.db.QueryRow(
 		`SELECT name, size, md5, created_at, updated_at FROM records WHERE name = ?`,
 		name,
-	).Scan(&r.Name, &r.Size, &r.MD5, &r.CreatedAt, &r.UpdatedAt)
+	).Scan(&r.Name, &r.Size, &r.MD5, &createdAt, &updatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return file.Record{}, caberr.NotFound(fmt.Sprintf("No file with name '%s' found", name))
 	}
 	if err != nil {
 		return file.Record{}, caberr.Internal("sqlite get", err)
+	}
+	if err := setTimes(createdAt, updatedAt, &r); err != nil {
+		return file.Record{}, caberr.Internal("sqlite get: settimes", err)
 	}
 
 	return r, nil
@@ -101,9 +110,15 @@ func (s SQLiteStore) List() (map[string]file.Record, error) {
 	list := make(map[string]file.Record)
 	for rows.Next() {
 		var r file.Record
-		if err := rows.Scan(&r.Name, &r.Size, &r.MD5, &r.CreatedAt, &r.UpdatedAt); err != nil {
+		var createdAt, updatedAt string
+
+		if err := rows.Scan(&r.Name, &r.Size, &r.MD5, &createdAt, &updatedAt); err != nil {
 			return nil, caberr.Internal("sqlite list: scan", err)
 		}
+		if err := setTimes(createdAt, updatedAt, &r); err != nil {
+			return nil, caberr.Internal("sqlite list: settimes", err)
+		}
+
 		list[r.Name] = r
 	}
 	if rows.Err() != nil {
@@ -111,6 +126,16 @@ func (s SQLiteStore) List() (map[string]file.Record, error) {
 	}
 
 	return list, nil
+}
+
+func setTimes(createdAt, updatedAt string, r *file.Record) error {
+	var err error
+	r.CreatedAt, err = time.Parse(timeLayout, createdAt)
+	if err != nil {
+		return err
+	}
+	r.UpdatedAt, err = time.Parse(timeLayout, updatedAt)
+	return err
 }
 
 func (s SQLiteStore) Delete(name string) error {
