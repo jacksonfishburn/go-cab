@@ -23,9 +23,25 @@ var grabCmd = &cobra.Command{
 	RunE:  grab,
 }
 
+var delCmd = &cobra.Command{
+	Use:   "del <name>",
+	Short: "Delete a Directory from storage",
+	Args:  cobra.ExactArgs(1),
+	RunE:  del,
+}
+
+var peekCmd = &cobra.Command{
+	Use:   "peek",
+	Short: "List Directories in storage",
+	Args:  cobra.NoArgs,
+	RunE:  peek,
+}
+
 func addCommands() {
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(grabCmd)
+	rootCmd.AddCommand(delCmd)
+	rootCmd.AddCommand(peekCmd)
 }
 
 func add(cmd *cobra.Command, args []string) error {
@@ -64,6 +80,24 @@ func grab(cmd *cobra.Command, args []string) error {
 	}
 
 	return putBlob(dir, blob)
+}
+
+func del(cmd *cobra.Command, args []string) error {
+	name := args[0]
+
+	c := newClient(apiURL, token)
+	return c.Del(name)
+}
+
+func peek(cmd *cobra.Command, args []string) error {
+	c := newClient(apiURL, token)
+	records, err := c.Peek()
+	if err != nil {
+		return err
+	}
+
+	printRecords(records...)
+	return nil
 }
 
 func printRecords(records ...file.Record) {

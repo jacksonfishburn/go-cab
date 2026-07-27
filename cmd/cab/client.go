@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sort"
 	"strings"
 	"time"
 
@@ -89,6 +90,40 @@ func (c *client) Grab(name string) ([]byte, error) {
 		return nil, err
 	}
 	return respBody, nil
+}
+
+func (c *client) Del(name string) error {
+	path := "del/" + url.PathEscape(name)
+
+	respBody, status, err := c.request(http.MethodDelete, path, nil)
+	if err != nil {
+		return err
+	}
+	return checkStatus(status, respBody)
+}
+
+func (c *client) Peek() ([]file.Record, error) {
+	respBody, status, err := c.request(http.MethodGet, "peek", nil)
+	if err != nil {
+		return nil, err
+	}
+	if err := checkStatus(status, respBody); err != nil {
+		return nil, err
+	}
+
+	var list map[string]file.Record
+	if err := json.Unmarshal(respBody, &list); err != nil {
+		return nil, fmt.Errorf("decode response: %w", err)
+	}
+
+	records := make([]file.Record, 0, len(list))
+	for _, r := range list {
+		records = append(records, r)
+	}
+	sort.Slice(records, func(i, j int) bool {
+		return records[i].Name < records[j].Name
+	})
+	return records, nil
 }
 
 func joinURL(base, path string) string {
